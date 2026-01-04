@@ -637,8 +637,10 @@ input[type="number"] {
 
 </div> <!-- /app-shell -->
 <script>
+
+
 /* ============================================================
-   UNDRA ENGINE v1.0 — BLOCK 2/10
+   UNDRA ENGINE v1.1 — BLOCK 2/10
    CORE-DATEN + INITIALISIERUNG + BASIS-FUNKTIONEN
    ============================================================ */
 
@@ -647,78 +649,176 @@ input[type="number"] {
 ----------------------------- */
 
 const attributes = [
-  "Mut", "Intelligenz", "Fingerfertigkeit", "Gewandtheit", "Körperkraft",
-  "Körperbewusstsein", "Konstitution", "Charisma", "Sozialstatus",
-  "Geistiger Zustand", "Intuition", "Angriff", "Verteidigung",
-  "Abwehrschlag", "Fernkampf", "Trefferchance", "Technik"
-];
-
-const attrShort = [
-  "MU","IN","FF","GE","KK","KB","KO","CH","SS","GZ","IT","AN","VE","AS","FK","TC","TE"
+  "Mut","Intelligenz","Fingerfertigkeit","Gewandtheit","Körperkraft",
+  "Körperbewusstsein","Konstitution","Charisma","Sozialstatus",
+  "Geistiger Zustand","Intuition","Angriff","Verteidigung",
+  "Abwehrschlag","Fernkampf","Trefferchance","Technik"
 ];
 
 /* -----------------------------
-   RASSEN / SUBRASSEN / PROFESSIONEN
+   RASSEN / SUBRASSEN / PROFESSIONEN — v1.1
 ----------------------------- */
 
 const originData = {
+
   "Mensch": {
-    subs: ["Mittelländer", "Tulamiden", "Thorwaler"],
-    profs: ["Ritter", "Dieb", "Händler", "Feuermagier", "Druide"]
+    subs: ["Mittelländer","Tulamiden","Thorwaler","Nivesen","Norbarden"],
+    profs: ["Ritter","Dieb","Händler","Feuermagier","Druide"]
   },
-  "Elf": {
-    subs: ["Hochelf", "Waldelf", "Dunkelelf"],
-    profs: ["Wildnisläufer", "Necromant", "Druide", "Sänger"]
-  },
+
   "Zwerg": {
-    subs: ["Ambosszwerg", "Erzzwerg"],
-    profs: ["Waffenschmied", "Bergmann"]
+    subs: ["Ambosszwerge","Erzzwerge","Hügelzwerge","Tiefenzwerge"],
+    profs: ["Waffenschmied","Bergmann","Krieger"]
   },
+
+  "Halbling": {
+    subs: ["Ackerbürger","Landadel","Flussstrolche"],
+    profs: ["Kundschafter","Dieb","Barde"]
+  },
+
+  "Drachengeborene": {
+    subs: ["Feuerblut","Eisatem","Giftzahn","Sturmschwingen"],
+    profs: ["Krieger","Schamane","Feuermagier"]
+  },
+
+  "Echsenmenschen": {
+    subs: ["Achaz","Maru"],
+    profs: ["Schamane","Kundschafter"]
+  },
+
+  "Schlangenmenschen": {
+    subs: ["Shingwa","Ssad'Navv","Zsahh-Kultisten"],
+    profs: ["Assassine","Hexer"]
+  },
+
   "Ork": {
-    subs: ["Schwarzpelz", "Zholochai"],
-    profs: ["Krieger", "Schamane"]
+    subs: ["Schwarzpelze","Zholochai","Mhurakh","Korogai"],
+    profs: ["Krieger","Schamane","Berserker"]
+  },
+
+  "Goblin": {
+    subs: ["Festumer Goblins","Waldgoblins","Höhlengoblins"],
+    profs: ["Dieb","Schamane","Jäger"]
+  },
+
+  "Gnom": {
+    subs: ["Tiefengnome","Tüftler","Waldgnome"],
+    profs: ["Erfinder","Alchemist","Barde"]
+  },
+
+  "Tabaxi": {
+    subs: ["Dschungelpfoten","Wüstenläufer","Schneeleoparden","Grenzländer"],
+    profs: ["Jäger","Kundschafter","Mönch"]
+  },
+
+  "Halbork": {
+    subs: ["Stadt-Halborks","Verstoßene"],
+    profs: ["Krieger","Söldner"]
+  },
+
+  "Troll": {
+    subs: ["Höhlentrolle","Bergtrolle","Waldtrolle"],
+    profs: ["Berserker","Schamane"]
   }
+
 };
 
 /* -----------------------------
-   IDENTITÄTSFELDER
+   SPEZIALFÄHIGKEITEN — RASSE
 ----------------------------- */
 
-const idFields = [
-  {id:"age",l:"Alter"}, {id:"size",l:"Größe"}, {id:"weight",l:"Gewicht"},
-  {id:"eyes",l:"Augen"}, {id:"hair",l:"Haare"}, {id:"skin",l:"Haut/Fell"},
-  {id:"hand",l:"Hand"}, {id:"voice",l:"Stimme"}, {id:"clothes",l:"Kleidung"},
-  {id:"spec",l:"Besonderes"}, {id:"origin",l:"Heimat"}, {id:"scent",l:"Geruch"}
-];
+const raceSpecials = {
+  "Mensch": ["Anpassungsfähig","Zäher Wille","Diplomatisches Geschick","Improvisationstalent","Überlebensinstinkt"],
+  "Zwerg": ["Steinherz","Dunkelsicht","Eisenhaut","Bergwissen","Runenresonanz"],
+  "Halbling": ["Glückskind","Leisetreter","Unauffällig","Flink wie ein Wiesel","Heimvorteil"],
+  "Drachengeborene": ["Drachenodem","Schuppenhaut","Elementarresistenz","Drakonische Präsenz","Blut des Ahnen"],
+  "Echsenmenschen": ["Kalte Instinkte","Regeneration","Amphibisch","Schuppenpanzer","Ritualblut"],
+  "Schlangenmenschen": ["Giftzahn","Hypnoseblick","Schlangengang","Kaltherzig","Schleier der Täuschung"],
+  "Ork": ["Berserkerwut","Blutrausch","Zäh wie Leder","Kriegsgebrüll","Nachtjäger"],
+  "Goblin": ["Schattenkriecher","Giftmischer","Flinkfinger","Tunnelblick","Rudeltaktik"],
+  "Gnom": ["Tüftlergeist","Illusionssinn","Mechanikus","Funkenmagie","Scharfsinn"],
+  "Tabaxi": ["Katzenreflexe","Nachtsicht","Sprungkraft","Jägerinstinkt","Lautloser Schritt"],
+  "Halbork": ["Halbwild","Zornreserve","Einschüchternde Präsenz","Knochenpanzer","Zäher Körper"],
+  "Troll": ["Regeneration","Felsenschlag","Trollhaut","Urkraft","Steinblut"]
+};
 
 /* -----------------------------
-   VORTEILE / NACHTEILE
+   SPEZIALFÄHIGKEITEN — SUBRASSEN
 ----------------------------- */
 
-const advPool = [
-  "Wachsam","Wetterfest","Tierfreund","Gutes Gehör","Sprachtalent","Richtungssinn",
-  "Eisernes Gedächtnis","Zäher Hund","Glückspilz","Scharfe Sicht","Balance-Gefühl",
-  "Hohe Schmerzgrenze","Giftresistenz","Eiserner Wille","Diplomat","Handwerksgeschick",
-  "Orientierung","Tarnung","Lügendetektor","Guter Tänzer","Adeliges Blut","Amphibisch",
-  "Astrale Regeneration","Beidhändigkeit","Brunnen der Kraft","Dunkelsicht",
-  "Eisresistenz","Empathie","Entfernungssinn","Fährtensinn","Feenfreund","Flink",
-  "Gefahreninstinkt","Geisteskraft","Hitzeresistenz","Immunität gegen Gift",
-  "Innere Uhr","Intuitive Führung","Kälteresistenz","Kampfreflexe","Magiegespür",
-  "Meisterdieb","Pflanzenflüsterer","Prophetische Träume","Schnelle Heilung",
-  "Schlangenmensch","Tiersprache","Unauffällig","Waffenmeister","Zwergennase"
-];
+const subSpecials = {
 
-const disPool = [
-  "Farbenblind","Tiefschläfer","Platzangst","Aberglaube","Wasserscheu","Höhenangst",
-  "Goldgier","Tollpatsch","Nachtblind","Kurzsichtig","Schwerhörig","Lahmheit",
-  "Einäugig","Alpträume","Pechvogel","Jähzorn","Neugierig","Verschwendungssüchtig",
-  "Feigheit","Arroganz","Blutrausch","Einbildung","Eitelkeit","Geiz","Hässlichkeit",
-  "Hitzeempfindlichkeit","Kälteempfindlichkeit","Krankheitsanfällig","Lichtempfindlich",
-  "Meeresangst","Messie","Misstrauen","Nahrungsrestriktion","Pechmagnet","Raumangst",
-  "Schlaflosigkeit","Schulden","Sensibler Magen","Spinnenangst","Spielsucht",
-  "Sprachfehler","Streitsucht","Totenangst","Unbeholfenheit","Vergesslichkeit",
-  "Verpflichtungen","Vorurteile","Wutanfälle","Zittrige Hände"
-];
+  "Mittelländer": ["Pflichtbewusst","Standhaft","Taktisches Denken"],
+  "Tulamiden": ["Wüstenläufer","Feilscher","Hitzeresistenz"],
+  "Thorwaler": ["Berserkerblut","Seefahrer","Sturmlauf"],
+  "Nivesen": ["Tierverbunden","Spurenleser","Eisresistenz"],
+  "Norbarden": ["Händlerblut","Glücksrad","Zähigkeit"],
+
+  "Ambosszwerge": ["Schmiedefeuer","Runenblick","Erzhaut"],
+  "Erzzwerge": ["Tiefensicht","Steinwissen","Axtmeister"],
+  "Hügelzwerge": ["Naturverbunden","Felsensinn","Zäher Körper"],
+  "Tiefenzwerge": ["Dunkelpfad","Höhleninstinkt","Steinschild"],
+
+  "Ackerbürger": ["Bodenverbunden","Erntesegen","Zäher Wille"],
+  "Landadel": ["Feinsinn","Etikette","Glücksgriff"],
+  "Flussstrolche": ["Flussschritt","Schleicher","Schnellfinger"],
+
+  "Feuerblut": ["Feuerodem","Hitzeschild","Glutkern"],
+  "Eisatem": ["Frosthauch","Kälteschild","Eisader"],
+  "Giftzahn": ["Toxischer Biss","Giftresistenz","Schlangensinn"],
+  "Sturmschwingen": ["Windstoß","Sturmresistenz","Donnerblick"],
+
+  "Achaz": ["Ritualblut","Schuppenpanzer","Kalte Logik"],
+  "Maru": ["Sumpftritt","Tarnhaut","Amphibisch"],
+
+  "Shingwa": ["Schleierblick","Giftader","Hypnose"],
+  "Ssad'Navv": ["Schattenhaut","Blutmagie","Schlangentanz"],
+  "Zsahh-Kultisten": ["Kultwissen","Ritualklinge","Schleier der Täuschung"],
+
+  "Schwarzpelze": ["Kriegsgebrüll","Blutdurst","Nachtjäger"],
+  "Zholochai": ["Wüstenkrieger","Sandhaut","Hitzeresistenz"],
+  "Mhurakh": ["Knochenpanzer","Urkraft","Berserkerwut"],
+  "Korogai": ["Reiterkrieger","Jagdinstinkt","Rudeltaktik"],
+
+  "Festumer Goblins": ["Stadtgassen-Instinkt","Flinkfinger","Schattenlauf"],
+  "Waldgoblins": ["Tarnhaut","Waldwissen","Rudelruf"],
+  "Höhlengoblins": ["Dunkelsicht","Tunnelkriecher","Giftmischer"],
+
+  "Tiefengnome": ["Funkenmagie","Mechanikus","Illusionsblick"],
+  "Tüftler": ["Erfindergeist","Schraubensinn","Schnellreparatur"],
+  "Waldgnome": ["Naturflüstern","Tarnhaut","Tierfreund"],
+
+  "Dschungelpfoten": ["Kletterkralle","Dschungelsinn","Sprungkraft"],
+  "Wüstenläufer": ["Hitzeresistenz","Sandtritt","Jägerblick"],
+  "Schneeleoparden": ["Frostfell","Eisresistenz","Lautloser Schritt"],
+  "Grenzländer": ["Spurenleser","Überlebensinstinkt","Reflexschub"],
+
+  "Stadt-Halborks": ["Einschüchternde Präsenz","Straßenkampf","Zähigkeit"],
+  "Verstoßene": ["Urwut","Überlebensdrang","Knochenpanzer"],
+
+  "Höhlentrolle": ["Dunkelwucht","Regeneration","Felsenschlag"],
+  "Bergtrolle": ["Steinblut","Urkraft","Bergschritt"],
+  "Waldtrolle": ["Tarnhaut","Naturwucht","Trollhaut"]
+};
+
+/* -----------------------------
+   PROFESSION = ATTRIBUTSBONUS
+----------------------------- */
+
+function getProfessionAttributeOptions() {
+    const opts = [];
+    const used = new Set();
+
+    while (opts.length < 3) {
+        const idx = Math.floor(Math.random() * attributes.length);
+        const attr = attributes[idx];
+        if (!used.has(attr)) {
+            used.add(attr);
+            opts.push(`${attr} +1`);
+        }
+    }
+    return opts;
+}
 
 /* -----------------------------
    CHARAKTERDATENSTRUKTUR
@@ -789,12 +889,27 @@ function init() {
       </div>`;
   });
 
-  /* --- Vorteile/Nachteile rendern --- */
-  renderTraits();
-
-  /* --- Inventar wird später in Block 4 initialisiert --- */
+  /* --- Portrait Loader --- */
+  document.getElementById("upload").addEventListener("change", loadPortrait);
 
   updateUI();
+}
+
+/* ============================================================
+   PORTRAIT
+============================================================ */
+
+function loadPortrait(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        document.getElementById("preview").src = ev.target.result;
+        document.getElementById("preview").style.display = "block";
+        document.getElementById("placeholder").style.display = "none";
+    };
+    reader.readAsDataURL(file);
 }
 
 /* ============================================================
@@ -822,6 +937,9 @@ function modAttr(a, v) {
 
 function selectRace(r) {
   char.race = r;
+  char.sub = "";
+  char.prof = "";
+  char.special = "";
 
   const sList = document.getElementById('sub-list');
   sList.innerHTML = "<h4>Untergruppen</h4>";
@@ -835,6 +953,8 @@ function selectRace(r) {
 
 function selectSub(s) {
   char.sub = s;
+  char.prof = "";
+  char.special = "";
 
   const pList = document.getElementById('prof-list');
   pList.innerHTML = "<h4>Professionen</h4>";
@@ -848,16 +968,54 @@ function selectSub(s) {
 
 function selectProf(p) {
   char.prof = p;
+  char.special = "";
 
-  /* Spezialfähigkeit — später erweiterbar */
-  char.special = [
-    "Göttlicher Funke",
-    "Schattenlauf",
-    "Manaschild",
-    "Eisenzorn"
-  ][Math.floor(Math.random()*4)];
-
+  openSpecialModal();
   updateUI();
+}
+
+/* ============================================================
+   SPEZIALFÄHIGKEITEN POPUP
+============================================================ */
+
+function getSpecialOptions(race, sub, prof) {
+    const raceList = raceSpecials[race] || [];
+    const subList = subSpecials[sub] || [];
+    const profList = getProfessionAttributeOptions();
+
+    const pool = [...raceList, ...subList, ...profList];
+
+    const result = [];
+    const used = new Set();
+
+    while (result.length < 3 && pool.length > 0) {
+        const pick = pool[Math.floor(Math.random() * pool.length)];
+        if (!used.has(pick)) {
+            used.add(pick);
+            result.push(pick);
+        }
+    }
+    return result;
+}
+
+function openSpecialModal() {
+    const opts = getSpecialOptions(char.race, char.sub, char.prof);
+    const box = document.getElementById("spec-options");
+    box.innerHTML = "";
+
+    opts.forEach(o => {
+        box.innerHTML += `
+            <button class="btn-main" onclick="selectSpecial('${o}')">${o}</button>
+        `;
+    });
+
+    document.getElementById("spec-modal").style.display = "flex";
+}
+
+function selectSpecial(s) {
+    char.special = s;
+    document.getElementById("spec-modal").style.display = "none";
+    updateUI();
 }
 
 /* ============================================================
@@ -866,24 +1024,84 @@ function selectProf(p) {
 
 function updateUI() {
 
-  document.getElementById('p-left').textContent = char.pool - char.used;
+  /* --- Name / Titel --- */
+  char.name = document.getElementById("in-name").value;
+  char.titel = document.getElementById("in-titel").value;
 
-  document.getElementById('s-race').textContent = char.race || "-";
-  document.getElementById('s-sub').textContent = char.sub || "-";
-  document.getElementById('s-prof').textContent = char.prof || "-";
-  document.getElementById('s-spec').textContent = char.special || "-";
+  /* --- Anzeige aktualisieren --- */
+  document.getElementById("s-race").textContent = char.race || "-";
+  document.getElementById("s-sub").textContent = char.sub || "-";
+  document.getElementById("s-prof").textContent = char.prof || "-";
+  document.getElementById("s-spec").textContent = char.special || "Wähle Volk & Beruf...";
 
+  /* --- Attribute aktualisieren --- */
   attributes.forEach(a => {
-    const val = char.attrs[a];
-    document.getElementById(`v-${a}`).textContent = val;
-
-    const btn = document.getElementById(`plus-${a}`);
-    btn.style.opacity = (char.pool - char.used <= 0 || val >= 10) ? "0.2" : "1";
+    document.getElementById("v-" + a).textContent = char.attrs[a];
   });
 
-  drawRadar("radarCanvas");
+  /* --- Radar zeichnen --- */
+  drawRadar();
+
+  /* --- Step 1 Freischaltung --- */
+  const nextBtn = document.querySelector("#step-1 .btn-next");
+  if (char.race && char.sub && char.prof && char.special) {
+      nextBtn.disabled = false;
+  } else {
+      nextBtn.disabled = true;
+  }
 }
 
+/* ============================================================
+   RADAR
+============================================================ */
+
+function drawRadar() {
+    const canvas = document.getElementById("radarCanvas");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const values = attributes.map(a => char.attrs[a] || 0);
+    const max = 10;
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const r = 90;
+
+    ctx.strokeStyle = "rgba(212,175,55,0.6)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+
+    values.forEach((v, i) => {
+        const angle = (Math.PI * 2 / values.length) * i - Math.PI / 2;
+        const dist = (v / max) * r;
+
+        const x = cx + Math.cos(angle) * dist;
+        const y = cy + Math.sin(angle) * dist;
+
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+
+    ctx.closePath();
+    ctx.stroke();
+
+    /* Punkte zeichnen */
+    ctx.fillStyle = "var(--gold)";
+    values.forEach((v, i) => {
+        const angle = (Math.PI * 2 / values.length) * i - Math.PI / 2;
+        const dist = (v / max) * r;
+
+        const x = cx + Math.cos(angle) * dist;
+        const y = cy + Math.sin(angle) * dist;
+
+        ctx.beginPath();
+        ctx.arc(x, y, 3, 0, Math.PI * 2);
+        ctx.fill();
+    });
+}
 /* ============================================================
    RADAR-DIAGRAMM
 ============================================================ */
@@ -938,31 +1156,170 @@ function drawRadar(id) {
    VORTEILE / NACHTEILE
 ============================================================ */
 
+/* ============================================================
+   UNDRA ENGINE v1.1 — BLOCK 3/10
+   VORTEILE / NACHTEILE + BEDINGUNGEN + STEP-2 LOGIK
+   ============================================================ */
+
+/* -----------------------------
+   VORTEILE / NACHTEILE RENDERN
+----------------------------- */
+
 function renderTraits() {
+    const advBox = document.getElementById("adv-list");
+    const disBox = document.getElementById("dis-list");
 
-  const advList = document.getElementById('adv-list');
-  const disList = document.getElementById('dis-list');
+    advBox.innerHTML = "";
+    disBox.innerHTML = "";
 
-  advList.innerHTML = "";
-  disList.innerHTML = "";
+    advPool.forEach(a => {
+        advBox.innerHTML += `
+            <div class="check-item" onclick="toggleAdv('${a}')">
+                ${a}
+            </div>`;
+    });
 
-  advPool.forEach(name => {
-    advList.innerHTML += `
-      <label class="check-item">
-        <input type="checkbox" onchange="updateChronik()" data-type="adv" value="${name}">
-        ${name}
-      </label>`;
-  });
-
-  disPool.forEach(name => {
-    disList.innerHTML += `
-      <label class="check-item">
-        <input type="checkbox" onchange="updateChronik()" data-type="dis" value="${name}">
-        ${name}
-      </label>`;
-  });
+    disPool.forEach(d => {
+        disBox.innerHTML += `
+            <div class="check-item" onclick="toggleDis('${d}')">
+                ${d}
+            </div>`;
+    });
 }
 
+/* -----------------------------
+   VORTEIL HINZUFÜGEN / ENTFERNEN
+----------------------------- */
+
+function toggleAdv(a) {
+    const idx = char.adv.indexOf(a);
+
+    if (idx >= 0) {
+        char.adv.splice(idx, 1);
+    } else {
+        char.adv.push(a);
+    }
+
+    updateTraitsUI();
+}
+
+/* -----------------------------
+   NACHTEIL HINZUFÜGEN / ENTFERNEN
+----------------------------- */
+
+function toggleDis(d) {
+    const idx = char.dis.indexOf(d);
+
+    if (idx >= 0) {
+        char.dis.splice(idx, 1);
+    } else {
+        char.dis.push(d);
+    }
+
+    updateTraitsUI();
+}
+
+/* -----------------------------
+   TRAIT UI + BEDINGUNGEN
+----------------------------- */
+
+function updateTraitsUI() {
+
+    // Pflichtregeln:
+    const minAdv = 2;
+    const minDis = 3;
+
+    const advCount = char.adv.length;
+    const disCount = char.dis.length;
+
+    // Bedingung: Nachteile müssen Vorteile um +1 übersteigen
+    const validRelation = disCount >= advCount + 1;
+
+    // Rote Regelanzeige aktualisieren
+    const ruleBox = document.querySelector(".rule-hint-red");
+
+    if (advCount >= minAdv && disCount >= minDis && validRelation) {
+        ruleBox.style.color = "var(--gold)";
+    } else {
+        ruleBox.style.color = "var(--danger)";
+    }
+
+    // Step 2 Button freischalten
+    const finishBtn = document.getElementById("btn-finish-check");
+
+    if (advCount >= minAdv && disCount >= minDis && validRelation) {
+        finishBtn.disabled = false;
+    } else {
+        finishBtn.disabled = true;
+    }
+
+    // Chronik aktualisieren
+    updateChronik();
+}
+
+/* -----------------------------
+   CHRONIK (SEITE 2)
+----------------------------- */
+
+function updateChronik() {
+    const block = document.getElementById("chronik-text-block");
+
+    block.innerHTML = `
+        <b>${char.name || "Unbenannter Held"}</b><br>
+        ${char.titel || ""}<br><br>
+
+        <b>Rasse:</b> ${char.race || "-"}<br>
+        <b>Untergruppe:</b> ${char.sub || "-"}<br>
+        <b>Profession:</b> ${char.prof || "-"}<br>
+        <b>Spezialfähigkeit:</b> ${char.special || "-"}<br><br>
+
+        <b>Vorteile:</b><br>
+        ${char.adv.length ? char.adv.join(", ") : "-"}<br><br>
+
+        <b>Nachteile:</b><br>
+        ${char.dis.length ? char.dis.join(", ") : "-"}<br>
+    `;
+
+    drawChronikRadar();
+}
+
+/* -----------------------------
+   CHRONIK-RADAR (SEITE 2)
+----------------------------- */
+
+function drawChronikRadar() {
+    const canvas = document.getElementById("chronikRadar");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const values = attributes.map(a => char.attrs[a] || 0);
+    const max = 10;
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const r = 80;
+
+    ctx.strokeStyle = "rgba(212,175,55,0.6)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+
+    values.forEach((v, i) => {
+        const angle = (Math.PI * 2 / values.length) * i - Math.PI / 2;
+        const dist = (v / max) * r;
+
+        const x = cx + Math.cos(angle) * dist;
+        const y = cy + Math.sin(angle) * dist;
+
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+
+    ctx.closePath();
+    ctx.stroke();
+}
 /* ============================================================
    CHRONIK UPDATE (STEP 2)
 ============================================================ */
@@ -1180,11 +1537,98 @@ function updateChronik() {
 
   /* --- Radar --- */
   drawRadar("chronikRadar");
-}/* ============================================================
-   UNDRA ENGINE v1.0 — BLOCK 4/10
-   SKILLS + ACTIVE ATTRIBUTES + STATS + INVENTAR + TIMELINE
+}
+
+/* ============================================================
+   UNDRA ENGINE v1.1 — BLOCK 4/10
+   INVENTAR + HANDEL + WÄHRUNGSSYSTEM
    ============================================================ */
 
+/* -----------------------------
+   INVENTAR INITIALISIEREN
+----------------------------- */
+
+function initInventar() {
+    const grid = document.getElementById("inv-grid");
+    grid.innerHTML = "";
+
+    for (let i = 0; i < 9; i++) {
+        grid.innerHTML += `
+            <div class="inv-slot">
+                <input type="text" placeholder="Gegenstand" style="width:70%;">
+                <input type="number" min="0" placeholder="Wert" style="width:25%;">
+            </div>`;
+    }
+}
+
+/* -----------------------------
+   WÄHRUNG AKTUALISIEREN
+----------------------------- */
+
+function updateCurrencyDisplay() {
+    const g = char.gold || 0;
+    const s = char.silber || 0;
+    const k = char.kupfer || 0;
+
+    document.getElementById("currency-display").textContent = `${g} G ${s} S ${k} K`;
+}
+
+/* -----------------------------
+   SP ANZEIGE AKTUALISIEREN
+----------------------------- */
+
+function updateSPDisplay() {
+    document.getElementById("sp-display").textContent = char.sp;
+}
+
+/* -----------------------------
+   VERKAUF / HANDEL MODAL
+----------------------------- */
+
+function confirmSell() {
+    const g = parseInt(document.getElementById("v-gold").value) || 0;
+    const s = parseInt(document.getElementById("v-silber").value) || 0;
+    const k = parseInt(document.getElementById("v-kupfer").value) || 0;
+
+    // SP-Berechnung: 1G = 100 SP, 1S = 10 SP, 1K = 1 SP
+    const spGain = g * 100 + s * 10 + k;
+
+    char.gold += g;
+    char.silber += s;
+    char.kupfer += k;
+    char.sp += spGain;
+
+    updateCurrencyDisplay();
+    updateSPDisplay();
+
+    document.getElementById("sell-modal").style.display = "none";
+}
+
+/* -----------------------------
+   TAG BEENDET / SP ZUWACHS
+----------------------------- */
+
+function closeThanks() {
+    char.day += 1;
+    char.sp += 1000;
+    char.dailyPoints += 1;
+
+    updateSPDisplay();
+    updateCurrencyDisplay();
+
+    document.getElementById("thanks-modal").style.display = "none";
+}
+
+/* -----------------------------
+   TAG BEENDEN BUTTON
+----------------------------- */
+
+function endDay() {
+    document.getElementById("thanks-text").textContent =
+        `Tag ${char.day} abgeschlossen. Du erhältst 1000 SP und 1 Attributpunkt.`;
+
+    document.getElementById("thanks-modal").style.display = "flex";
+}
 /* ============================================================
    SKILL-BLOCKS (STEP 3)
 ============================================================ */
@@ -1422,11 +1866,151 @@ function initPage3() {
 
   /* --- Timeline --- */
   updateTimeline();
-}/* ============================================================
-   UNDRA ENGINE v1.0 — BLOCK 5/10
-   STABILITÄT + UI-POLISHING + RADAR-OPTIMIERUNG
+}
+
+/* ============================================================
+   UNDRA ENGINE v1.1 — BLOCK 5/10
+   VITALWERTE + AKTIVE ATTRIBUTE + FINAL-RADAR
    ============================================================ */
 
+/* -----------------------------
+   AKTIVE ATTRIBUTE (STEP 3)
+----------------------------- */
+
+function initActiveAttributes() {
+    const grid = document.getElementById("active-attr-grid");
+    grid.innerHTML = "";
+
+    attributes.forEach(a => {
+        grid.innerHTML += `
+            <div class="attr-row">
+                <span style="font-size:12px;">${a}</span>
+                <button class="btn-upgrade" onclick="upgradeActiveAttr('${a}')">+</button>
+                <div class="val-box" id="active-${a}">0</div>
+            </div>
+        `;
+        char.skills.base[a] = 0;
+    });
+}
+
+function upgradeActiveAttr(a) {
+    if (char.dailyPoints <= 0) return;
+
+    char.skills.base[a] += 1;
+    char.dailyPoints -= 1;
+
+    updateActiveAttributesUI();
+    updateFinalStats();
+}
+
+function updateActiveAttributesUI() {
+    attributes.forEach(a => {
+        document.getElementById("active-" + a).textContent = char.skills.base[a] || 0;
+    });
+}
+
+/* -----------------------------
+   VITALWERTE BERECHNEN
+----------------------------- */
+
+function calcVitalwerte() {
+    const KK = char.attrs["Körperkraft"] || 0;
+    const KO = char.attrs["Konstitution"] || 0;
+    const GE = char.attrs["Gewandtheit"] || 0;
+    const AN = char.attrs["Angriff"] || 0;
+    const VE = char.attrs["Verteidigung"] || 0;
+    const TC = char.attrs["Trefferchance"] || 0;
+
+    return {
+        leben: 20 + KO * 2 + KK,
+        ausdauer: 10 + KO + GE,
+        ruestung: Math.floor((KO + GE) / 3),
+        geist: 10 + (char.attrs["Geistiger Zustand"] || 0),
+        treffer: 30 + TC + Math.floor(AN / 2)
+    };
+}
+
+/* -----------------------------
+   FINAL-STATS AUF SEITE 3
+----------------------------- */
+
+function updateFinalStats() {
+    const v = calcVitalwerte();
+
+    document.querySelector("#calc-le span").textContent = v.leben;
+    document.querySelector("#calc-en span").textContent = v.ausdauer;
+    document.querySelector("#calc-rs span").textContent = v.ruestung;
+    document.querySelector("#calc-gg span").textContent = v.geist;
+    document.querySelector("#calc-tc span").textContent = v.treffer;
+}
+
+/* -----------------------------
+   FINAL-RADAR (SEITE 3)
+----------------------------- */
+
+function drawFinalRadar() {
+    const canvas = document.getElementById("finalRadar");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const values = attributes.map(a => (char.attrs[a] || 0) + (char.skills.base[a] || 0));
+    const max = 15; // 10 Basis + 5 aktive Attribute
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const r = 90;
+
+    ctx.strokeStyle = "rgba(212,175,55,0.6)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+
+    values.forEach((v, i) => {
+        const angle = (Math.PI * 2 / values.length) * i - Math.PI / 2;
+        const dist = (v / max) * r;
+
+        const x = cx + Math.cos(angle) * dist;
+        const y = cy + Math.sin(angle) * dist;
+
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+
+    ctx.closePath();
+    ctx.stroke();
+}
+
+/* -----------------------------
+   STEP 3 INITIALISIEREN
+----------------------------- */
+
+function initStep3() {
+    initActiveAttributes();
+    updateActiveAttributesUI();
+    updateFinalStats();
+    drawFinalRadar();
+
+    // Portrait übertragen
+    const finalPortrait = document.getElementById("final-portrait");
+    const preview = document.getElementById("preview");
+    if (preview && preview.src) {
+        finalPortrait.src = preview.src;
+    }
+}
+
+/* -----------------------------
+   STEP-WECHSEL
+----------------------------- */
+
+function toStep3() {
+    document.getElementById("step-1").classList.remove("active");
+    document.getElementById("step-2").classList.remove("active");
+    document.getElementById("step-3").classList.add("active");
+
+    initStep3();
+}
 /* ============================================================
    1. SICHERE GET-ELEMENT-FUNKTION
    Verhindert JS-Abbrüche, wenn ein Element fehlt.
