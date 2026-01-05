@@ -1,657 +1,631 @@
 <!DOCTYPE html>
+
 <html lang="de">
+
 <head>
-  <meta charset="UTF-8">
-  <title>UNDRA ENGINE v1.1</title>
+
+  <meta charset="utf-8" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <title>Heldenbrief - Edition 2025</title>
+
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #eee;
+
+    :root {
+
+      --bg-dark: #050306;
+
+      --panel-bg: linear-gradient(135deg, #1a121a 0%, #0a050a 100%);
+
+      --stone-bg: radial-gradient(circle, #3d3d3d 0%, #1a1a1a 100%);
+
+      --gold: #d4af37; --gold-bright: #f8e7b0; --gold-shadow: rgba(212, 175, 55, 0.5);
+
+      --text: #eaddca; --muted: #a69586; --danger: #ff4b5c;
+
+      --header-gradient: linear-gradient(to bottom, rgba(60,10,10,0.9), rgba(30,5,10,1));
+
+      --font-header: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+
+      --font-body: 'Georgia', serif;
+
     }
-    h1,h2,h3 {
-      color:#f5e6b3;
-    }
-    .container {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 16px;
-    }
-    .steps-nav {
-      display:flex;
-      gap:8px;
-      margin-bottom:12px;
-    }
-    .steps-nav button {
-      flex:1;
-      padding:8px;
-      background:#222;
-      color:#eee;
-      border:1px solid #555;
-      cursor:pointer;
-    }
-    .steps-nav button.active {
-      background:#444;
-      border-color:#d4af37;
-      color:#fff;
-    }
-    .step {
-      display:none;
-      border:1px solid #333;
-      padding:12px;
-      border-radius:4px;
-      background:#181818;
-      margin-bottom:16px;
-    }
-    .step.active { display:block; }
-    .flex { display:flex; gap:16px; }
-    .column { flex:1; min-width:0; }
-    .attr-row, .skill-row {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      margin-bottom:4px;
-    }
-    .val-box {
-      min-width:32px;
-      text-align:center;
-      padding:2px 4px;
-      border:1px solid #555;
-      border-radius:3px;
-      background:#222;
-      color:#f5e6b3;
-    }
-    .btn, .btn-upgrade {
-      padding:4px 8px;
-      background:#333;
-      border:1px solid #777;
-      color:#eee;
-      cursor:pointer;
-      border-radius:3px;
-      font-size:12px;
-    }
-    .btn.primary {
-      background:#d4af37;
-      color:#111;
-      border-color:#f5e6b3;
-    }
-    .portrait-box, .final-portrait-box {
-      width:180px;
-      height:220px;
-      border:1px solid #555;
-      background:#000;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      overflow:hidden;
-    }
-    .portrait-box img,
-    .final-portrait-box img {
-      max-width:100%;
-      max-height:100%;
-    }
-    canvas {
-      background:#000;
-      border:1px solid #555;
-    }
-    textarea {
-      width:100%;
-      min-height:100px;
-      background:#111;
-      color:#eee;
-      border:1px solid #555;
-      border-radius:3px;
-      padding:4px;
-      font-size:12px;
-    }
-    input, select {
-      background:#111;
-      color:#eee;
-      border:1px solid #555;
-      border-radius:3px;
-      padding:3px;
-      font-size:12px;
-    }
-    .small-label {
-      font-size:11px;
-      color:#aaa;
-    }
-    .dice-box {
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-      margin-bottom:6px;
-    }
-    .dice-btn {
-      padding:6px 8px;
-      font-size:13px;
-      background:#222;
-      color:#f5e6b3;
-      border:1px solid #d4af37;
-      border-radius:4px;
-      cursor:pointer;
-    }
-    #last-roll {
-      font-size:12px;
-      margin-bottom:8px;
-    }
-    .history-box,
-    .timeline-box,
-    .skills-list,
-    #combat-log,
-    #travel-log,
-    #quest-log,
-    #merchant-log,
-    #rest-log,
-    #status-log,
-    #money-history {
-      max-height:220px;
-      overflow-y:auto;
-      border:1px solid #333;
-      padding:6px;
-      background:#101010;
-      font-size:12px;
-    }
-    .history-entry, .timeline-entry { margin-bottom:3px; }
-    .inv-grid { display:grid; gap:4px; }
-    .inv-slot {
-      display:flex;
-      align-items:center;
-      gap:4px;
-      border:1px solid #333;
-      padding:2px 4px;
-    }
-    .inv-icon { width:20px; text-align:center; }
-    .tag {
-      display:inline-block;
-      padding:2px 6px;
-      margin:2px;
-      border-radius:3px;
-      border:1px solid #555;
-      font-size:11px;
-      cursor:pointer;
-    }
-    .tag.selected {
-      background:#d4af37;
-      color:#111;
-      border-color:#f5e6b3;
-    }
-    .top-bar {
-      display:flex;
-      justify-content:space-between;
-      margin-bottom:8px;
-      font-size:12px;
-    }
-    .hidden { display:none !important; }
-    .modal-backdrop {
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,0.7);
-      display:none;
-      justify-content:center;
-      align-items:center;
-      z-index:1000;
-    }
-    .modal {
-      background:#181818;
-      border:1px solid #555;
-      padding:16px;
-      border-radius:4px;
-      max-width:380px;
-      width:90%;
-      color:#eee;
-      font-size:13px;
-    }
-    .row { margin-bottom:6px; }
-    .currency-display, .sp-display {
-      margin-bottom:4px;
-      font-size:13px;
-    }
-    #combat-ui.hidden { display:none; }
-    .status-icon {
-      width:20px;
-      height:20px;
-      border-radius:50%;
-      border:1px solid #555;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      font-size:11px;
-      margin-right:4px;
-      cursor:pointer;
-    }
-    .ability-row {
-      border-bottom:1px solid #333;
-      padding:4px 0;
-      font-size:12px;
-    }
-    .ability-name.learned { color:#d4af37; }
-    .merchant-slot {
-      display:flex;
-      align-items:center;
-      gap:4px;
-      border:1px solid #333;
-      padding:2px 4px;
-      margin-bottom:2px;
-    }
-    #rest-dropdown { position:relative; }
-    #rest-dropdown-menu {
-      position:absolute;
-      top:100%;
-      left:0;
-      background:#222;
-      border:1px solid #555;
-      padding:4px;
-      z-index:500;
-    }
+
+
+
+    * { box-sizing: border-box; }
+
+    body { margin: 0; background: #050306; color: var(--text); font-family: var(--font-body); min-height: 100vh; }
+
+
+
+    #app-shell { width: 950px; margin: 20px auto; background: var(--panel-bg); border: 2px solid var(--gold); position: relative; border-radius: 8px; box-shadow: 0 10px 50px #000; overflow: hidden; }
+
+
+
+    header { padding: 20px; background: var(--header-gradient); border-bottom: 2px solid var(--gold); text-align: center; position: relative; }
+
+    header h1 { margin: 0; font-family: var(--font-header); color: var(--gold-bright); text-transform: uppercase; letter-spacing: 4px; }
+
+
+
+    .step-content { display: none; padding: 20px; }
+
+    .step-content.active { display: block; }
+
+
+
+    .panel { border: 1px solid var(--gold); margin-bottom: 20px; border-radius: 5px; background: rgba(0,0,0,0.4); overflow: hidden; }
+
+    .panel-header { background: var(--header-gradient); padding: 8px 15px; border-bottom: 1px solid var(--gold); color: var(--gold-bright); font-family: var(--font-header); display: flex; justify-content: space-between; font-size: 14px; }
+
+
+
+    .identity-grid { display: grid; grid-template-columns: 180px 1fr 240px; gap: 15px; padding: 15px; }
+
+    .attr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 30px; padding: 15px; }
+
+    .origin-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; background: var(--gold); border: 1px solid var(--gold); height: 300px; }
+
+    .origin-col { background: #0a050a; overflow-y: auto; padding: 10px; scrollbar-width: thin; scrollbar-color: var(--gold) #000; }
+
+    .origin-col h4 { color: var(--gold); text-align: center; border-bottom: 1px solid var(--gold-shadow); margin-top: 0; font-size: 14px; }
+
+
+
+    .btn-main { padding: 10px 20px; border: 2px solid var(--gold); background: #2a1a0a; color: var(--gold); cursor: pointer; font-weight: bold; font-family: var(--font-header); text-transform: uppercase; border-radius: 20px; font-size: 12px; }
+
+    .btn-next { background: linear-gradient(to bottom, #8a1515, #500505); color: white; }
+
+    .btn-upgrade { width: 22px; height: 22px; background: #1a121a; border: 1px solid var(--gold); color: var(--gold); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+
+    .glow { box-shadow: 0 0 10px var(--gold); border-color: var(--gold-bright); color: var(--gold-bright); }
+
+
+
+    .attr-row { display: grid; grid-template-columns: 1fr auto 40px auto; gap: 10px; align-items: center; padding: 4px; border-bottom: 1px solid rgba(212,175,55,0.1); }
+
+    .val-box { background: #000; border: 1px solid var(--gold); text-align: center; color: var(--gold-bright); border-radius: 3px; font-weight: bold; }
+
+    .check-item { display: block; padding: 5px; cursor: pointer; border-bottom: 1px solid #222; font-size: 12px; }
+
+    .check-item:hover { background: rgba(212,175,55,0.1); }
+
+    .trait-tag { display: inline-block; background: rgba(212,175,55,0.1); border: 1px solid var(--gold-shadow); padding: 2px 8px; margin: 2px; border-radius: 10px; font-size: 11px; }
+
+
+
+    .summary-panel-final { background: var(--stone-bg); padding: 30px; border-radius: 4px; box-shadow: inset 0 0 50px #000; border: 2px solid #333; }
+
+    .ornamental-frame { border: 1px solid #444; padding: 20px; position: relative; }
+
+    .ornamental-frame::before { content: "❦"; position: absolute; top: -10px; left: -10px; color: var(--gold); font-size: 20px; }
+
+
+
+    #timeline { position: absolute; right: 0; top: 100px; width: 100px; background: rgba(0,0,0,0.85); border-left: 1px solid var(--gold); padding: 10px; height: 500px; display: none; flex-direction: column; gap: 5px; overflow-y: auto; z-index: 10; border-radius: 8px 0 0 8px; }
+
+    .day-check { font-size: 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding: 2px 0; }
+
+
+
+    .portrait-frame { width: 160px; height: 210px; border: 2px solid var(--gold); background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 8px; }
+
+    .portrait-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+
+
+    .status-top-grid { display: grid; grid-template-columns: 1fr 180px 240px; gap: 2px; background: var(--gold); border: 1px solid var(--gold); margin-bottom: 20px; }
+
+    .status-cell { background: #0a050a; padding: 15px; font-size: 12px; }
+
+    .skill-item { display: flex; justify-content: space-between; align-items: center; padding: 3px 6px; background: rgba(0,0,0,0.3); margin-bottom: 2px; border-radius: 4px; font-size: 11px; }
+
+    .inventar-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 15px; }
+
+    .inv-slot { display: flex; justify-content: space-between; align-items: center; padding: 4px; border: 1px solid #444; background: rgba(0,0,0,0.4); font-size: 10px; }
+
+
+
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
+
+    .modal-box { background: var(--panel-bg); border: 2px solid var(--gold); padding: 30px; width: 400px; text-align: center; border-radius: 10px; }
+
+    
+
+    input[type="text"], input[type="number"] { background: #000; border: 1px solid #444; color: var(--gold-bright); padding: 5px; border-radius: 4px; width: 100%; }
+
+
+
+    .rule-hint-red { color: var(--danger); font-size: 11px; text-align: center; font-weight: bold; margin-top: 10px; font-style: italic; }
+
   </style>
+
 </head>
+
 <body>
-<div class="container">
-  <h1>UNDRA ENGINE v1.1</h1>
-  <div class="top-bar">
-    <div>Version: <span id="version-tag">1.1</span></div>
-    <div>Aktueller Tag: <span id="day-display">1</span></div>
-  </div>
 
-  <div class="steps-nav">
-    <button id="nav-step-1" class="active" onclick="toStep(1)">STEP 1 – Ursprung</button>
-    <button id="nav-step-2" onclick="toStep(2)">STEP 2 – Entscheidungen</button>
-    <button id="nav-step-3" onclick="toStep(3)">STEP 3 – Aventur</button>
-  </div>
 
-  <!-- STEP 1 -->
-  <div id="step-1" class="step active">
-    <div class="flex">
-      <div class="column">
-        <h2>Portrait & Basisdaten</h2>
+
+<div id="app-shell">
+
+  <div id="timeline"></div>
+
+
+
+  <header>
+
+    <h1 id="main-title">Heldenbrief</h1>
+
+    <div id="header-sub-data" style="color: var(--gold); font-size: 13px; margin-top: 5px;"></div>
+
+  </header>
+
+
+
+  <div id="step-1" class="step-content active">
+
+    <div class="panel">
+
+      <div class="identity-grid">
+
         <div class="portrait-box">
-          <img id="preview" alt="Portrait">
-        </div>
-        <div class="row">
-          <input type="file" id="portrait-input" accept="image/*">
-        </div>
-        <div class="row">
-          <label class="small-label">Name:</label>
-          <input type="text" id="char-name" placeholder="Name">
-        </div>
-        <div class="row">
-          <label class="small-label">Rasse:</label>
-          <select id="race-select"></select>
-        </div>
-        <div class="row">
-          <label class="small-label">Profession:</label>
-          <select id="profession-select"></select>
-        </div>
-        <div class="row">
-          <button class="btn" onclick="openSpecialModal()">Spezialfähigkeit</button>
-        </div>
-      </div>
 
-      <div class="column">
-        <h2>Attribute</h2>
-        <div id="attr-grid"></div>
-        <div class="row">
-          <button class="btn" onclick="randomizeAttributes()">Attribute würfeln</button>
-        </div>
-        <h3>Attribut-Radar</h3>
-        <canvas id="attrRadar" width="260" height="260"></canvas>
-      </div>
+          <div class="portrait-frame"><img id="preview" src="" style="display:none;"><div id="placeholder" style="color:#333">Portrait</div></div>
 
-      <div class="column">
-        <h2>Chronik – Ursprung</h2>
-        <textarea id="origin-text" placeholder="Beschreibe Ursprung, Kindheit, Herkunft..."></textarea>
-        <div class="row">
-          <button class="btn primary" onclick="toStep(2)">Weiter zu STEP 2</button>
-        </div>
-      </div>
-    </div>
-  </div>
+          <input type="file" id="upload" style="font-size: 10px; margin-top: 5px; width: 100%;">
 
-  <!-- STEP 2 -->
-  <div id="step-2" class="step">
-    <div class="flex">
-      <div class="column">
-        <h2>Vorteile</h2>
-        <div id="vorteile-list"></div>
-      </div>
-      <div class="column">
-        <h2>Nachteile</h2>
-        <div id="nachteile-list"></div>
-      </div>
-      <div class="column">
-        <h2>Chronik – Entscheidungen</h2>
-        <textarea id="chronik-text" placeholder="Entscheidungen, Wendepunkte, Verluste, Schwüre..."></textarea>
-        <div class="row small-label" id="vn-status"></div>
-        <div class="row">
-          <button class="btn" onclick="toStep(1)">Zurück zu STEP 1</button>
-          <button class="btn primary" id="finish-step-2-btn" disabled onclick="toStep(3)">Erstellung abschließen</button>
         </div>
-        <h3>Entscheidungs-Radar</h3>
-        <canvas id="chronikRadar" width="260" height="260"></canvas>
-      </div>
-    </div>
-  </div>
 
-  <!-- STEP 3 -->
-  <div id="step-3" class="step">
-    <div class="flex">
-      <div class="column">
-        <h2>Finalportrait & Vitalwerte</h2>
-        <div class="final-portrait-box">
-          <img id="final-portrait" alt="Finalportrait">
-        </div>
-        <div class="row">
-          LE: <span id="calc-le-val">0</span> |
-          EN: <span id="calc-en-val">0</span> |
-          RS: <span id="calc-rs-val">0</span> |
-          GG: <span id="calc-gg-val">0</span> |
-          TC: <span id="calc-tc-val">0</span>
-        </div>
-        <h3>Final-Radar</h3>
-        <canvas id="finalRadar" width="260" height="260"></canvas>
-        <div class="row">
-          <span class="small-label">Leben: <span id="life-current"></span>/<span id="life-max"></span></span><br>
-          <span class="small-label">Ausdauer: <span id="stamina-current"></span>/<span id="stamina-max"></span></span>
-        </div>
-        <div class="row small-label">
-          Rüstungspuffer: <span id="armor-buffer">0</span>
-          <button class="btn" onclick="upgradeArmorBuffer()">Puffer steigern</button>
-        </div>
-        <div class="row small-label">
-          Trefferzone: <span id="zone-info-name"></span> – <span id="zone-info-state"></span>
-        </div>
-      </div>
+        <div>
 
-      <div class="column">
-        <h2>Aktive Attribute & Würfel</h2>
-        <div class="row small-label">Tagespunkte: <span id="daily-points-display">0</span></div>
-        <div id="active-attr-grid"></div>
-        <h3>Würfel</h3>
-        <div id="dice-box" class="dice-box"></div>
-        <div id="last-roll">Noch kein Wurf</div>
-        <div class="row">
-          <button class="btn" onclick="playerAttack()">Angriff</button>
-          <button class="btn" onclick="playerDefend()">Verteidigung</button>
-          <button class="btn" onclick="playerDodge()">Ausweichen</button>
-        </div>
-        <div class="row">
-          <button class="btn" onclick="openProbePopup()">Probe</button>
-          <button class="btn" onclick="openEnemyLevelMenu()">Gegner erzeugen</button>
-        </div>
-        <div class="row small-label">
-          <div id="combat-ui" class="hidden">
-            Gegner: <span id="enemy-name">—</span> |
-            LP: <span id="enemy-life">-</span>
+          <input type="text" id="in-name" placeholder="Name des Helden" style="font-size: 18px; margin-bottom: 10px;">
+
+          <input type="text" id="in-titel" placeholder="Zusatz / Titel">
+
+          <div style="margin-top: 15px; font-size: 13px; border: 1px solid var(--gold-shadow); padding: 10px; background: rgba(0,0,0,0.2);">
+
+            <div><b>Rasse:</b> <span id="s-race">-</span></div>
+
+            <div><b>Untergruppe:</b> <span id="s-sub">-</span></div>
+
+            <div><b>Profession:</b> <span id="s-prof">-</span></div>
+
+            <div style="color: var(--gold-bright); margin-top: 8px;"><b>Spezialfähigkeit:</b> <br><span id="s-spec" style="font-style: italic;">Wähle Volk & Beruf...</span></div>
+
           </div>
+
         </div>
-        <h3>Kampf-Log</h3>
-        <div id="combat-log"></div>
+
+        <div class="radar-box" style="background:rgba(0,0,0,0.4); border:1px solid var(--gold); padding:5px;">
+
+          <canvas id="radarCanvas" width="220" height="220"></canvas>
+
+        </div>
+
       </div>
 
-      <div class="column">
-        <h2>Inventar & Tag</h2>
-        <div class="currency-display">
-          Währung: <span id="currency-display">0 G 0 S 0 K</span>
+    </div>
+
+
+
+    <div class="panel">
+
+      <div class="panel-header"><div>Basisattribute</div><small>Maximalstufe je Basisattribut beträgt 10.</small></div>
+
+      <div id="attr-grid-s1" class="attr-grid"></div>
+
+      <div style="padding: 15px; text-align: center; background: rgba(0,0,0,0.2);">
+
+        <button class="btn-main" id="roll-btn">Punkte auswürfeln</button>
+
+        <span style="margin-left: 20px;">Punkte: <b id="p-left">0</b></span>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="panel">
+
+      <div class="origin-grid">
+
+        <div class="origin-col" id="race-list"><h4>Rassen</h4></div>
+
+        <div class="origin-col" id="sub-list"><h4>Untergruppen</h4></div>
+
+        <div class="origin-col" id="prof-list"><h4>Professionen</h4></div>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="footer-bar" style="padding:15px; display:flex; justify-content:space-between;">
+
+      <button class="btn-main" onclick="saveCharacterLocal()">Lokal Speichern</button>
+
+      <button class="btn-main btn-next" onclick="toStep2()">Weiter zu Seite 2</button>
+
+    </div>
+
+  </div>
+
+
+
+  <div id="step-2" class="step-content">
+
+    <div class="panel">
+
+      <div class="panel-header">Körperliche Merkmale & Identität</div>
+
+      <div id="id-grid-s2" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 15px; font-size: 12px;"></div>
+
+    </div>
+
+
+
+    <div class="panel">
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--gold);">
+
+        <div class="origin-col" style="height: 300px;">
+
+          <h4 style="position: sticky; top: 0; background: #0a050a; z-index: 5;">Vorteile (+1 SP)</h4>
+
+          <div id="adv-list"></div>
+
         </div>
-        <div class="sp-display">
-          SP: <span id="sp-display">0</span>
+
+        <div class="origin-col" style="height: 300px;">
+
+          <h4 style="position: sticky; top: 0; background: #0a050a; z-index: 5;">Nachteile (+1 SP)</h4>
+
+          <div id="dis-list"></div>
+
         </div>
-        <h3>Inventar</h3>
-        <div class="inv-grid">
-          <div>
-            <strong>Klein</strong>
-            <div id="inv-small"></div>
+
+      </div>
+
+      <div class="rule-hint-red">
+
+        Bedingung: Mindestens 2 Vorteile und 3 Nachteile Pflicht. Nachteile müssen Vorteile immer um +1 übersteigen!
+
+      </div>
+
+    </div>
+
+
+
+    <div class="summary-panel-final">
+
+      <div class="ornamental-frame">
+
+        <h3 style="font-family:var(--font-header); color:var(--gold); text-transform:uppercase; letter-spacing:4px; margin-bottom:15px; border-bottom:1px solid #444;">Helden-Chronik</h3>
+
+        <div style="display: grid; grid-template-columns: 1fr 240px; gap: 20px;">
+
+          <div id="chronik-text-block" style="font-size: 13px; line-height: 1.5;"></div>
+
+          <div style="text-align:center;">
+
+            <canvas id="chronikRadar" width="220" height="220" style="transform: scale(0.8);"></canvas>
+
+            <div id="chronik-traits-cloud" style="margin-top: 5px;"></div>
+
           </div>
-          <div>
-            <strong>Mittel</strong>
-            <div id="inv-medium"></div>
-          </div>
-          <div>
-            <strong>Groß</strong>
-            <div id="inv-large"></div>
-          </div>
+
         </div>
-        <h3>Ausrüstung</h3>
-        <div class="row small-label">
-          Waffe: <span id="equip-weapon">—</span>
-          <button class="btn" onclick="unequipItem('weapon')">Ablegen</button>
-        </div>
-        <div class="row small-label">
-          Rüstung: <span id="equip-armor">—</span>
-          <button class="btn" onclick="unequipItem('armor')">Ablegen</button>
-        </div>
-        <div class="row">
-          <button class="btn" onclick="openSellPopup('small',0)">Verkauf / Test</button>
-        </div>
-        <div class="row">
-          <button class="btn primary" onclick="endDay()">Tag beenden</button>
-        </div>
-        <h3>Timeline (Tage)</h3>
-        <div id="timeline-box" class="timeline-box"></div>
+
       </div>
+
     </div>
 
-    <div class="flex" style="margin-top:16px;">
-      <div class="column">
-        <h2>Historie</h2>
-        <div id="history-box" class="history-box"></div>
-      </div>
-      <div class="column">
-        <h2>Skills & Fähigkeiten</h2>
-        <h4>Kompetenz-Fähigkeiten</h4>
-        <div class="skills-list" id="skills-list"></div>
-        <h4>Modul-8-Kampf-Fähigkeiten</h4>
-        <div id="ability-list" class="skills-list"></div>
-        <h4>Seite-3-Fähigkeiten (Modul 16)</h4>
-        <div class="skills-list">
-          <div><strong>Basis</strong></div>
-          <div id="abilities-basic"></div>
-          <div><strong>Rasse</strong></div>
-          <div id="abilities-race"></div>
-          <div><strong>Profession</strong></div>
-          <div id="abilities-profession"></div>
-          <div class="small-label">Verfügbare SP: <span id="abilities-sp-available">0</span></div>
-          <div id="ability-log"></div>
-        </div>
-      </div>
-      <div class="column">
-        <h2>Reise / Quests / Status / Ruhe</h2>
-        <h4>Reise</h4>
-        <button class="btn" onclick="openTravelMenu()">Reise starten</button>
-        <div id="travel-log"></div>
-        <h4>Quests</h4>
-        <button class="btn" onclick="openQuestCompletePopup()">Quest abschließen (Code)</button>
-        <button class="btn" onclick="openQuestRewardPopup()">Quest-Belohnung einlösen</button>
-        <div id="quest-log"></div>
-        <h4>Status-Effekte</h4>
-        <div id="status-effects"></div>
-        <div id="status-log"></div>
-        <h4>Rast</h4>
-        <div id="rest-dropdown">
-          <button class="btn" onclick="openRestDropdown()">Rasten</button>
-          <div id="rest-dropdown-menu" class="hidden">
-            <button class="btn" onclick="restShort()">Kurze Rast</button>
-            <button class="btn" onclick="restCamp()">Lager errichten</button>
-            <button class="btn" onclick="openOvernightOptions()">Übernachtung</button>
-          </div>
-        </div>
-        <div id="rest-log"></div>
-        <h4>Buffs</h4>
-        <div id="buff-list"></div>
-      </div>
+
+
+    <div class="footer-bar" style="padding:15px; display:flex; justify-content:space-between; margin-top:20px;">
+
+      <button class="btn-main" onclick="toStep1()">Zurück</button>
+
+      <button class="btn-main btn-next" id="btn-finish-check" onclick="toStep3()" disabled>Erstellung Abschließen</button>
+
     </div>
+
   </div>
+
+
+
+  <div id="step-3" class="step-content">
+
+    <div class="status-top-grid">
+
+      <div class="status-cell" id="stat-merkmale-final"></div>
+
+      <div class="status-cell" style="display:flex; justify-content:center;"><div class="portrait-frame"><img id="final-portrait"></div></div>
+
+      <div class="status-cell" style="background:rgba(0,0,0,0.6)"><canvas id="finalRadar" width="220" height="220"></canvas></div>
+
+    </div>
+
+
+
+    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
+
+      <div class="panel"><div class="panel-header">Basis (50 SP)</div><div id="skills-base" class="origin-col" style="height:220px;"></div></div>
+
+      <div class="panel"><div class="panel-header">Rasse (300 SP)</div><div id="skills-race" class="origin-col" style="height:220px;"></div></div>
+
+      <div class="panel"><div class="panel-header">Profession (500 SP)</div><div id="skills-prof" class="origin-col" style="height:220px;"></div></div>
+
+    </div>
+
+
+
+    <div class="panel">
+
+        <div class="panel-header">Aktive Attribute (1 Pkt / Tag)</div>
+
+        <div id="active-attr-grid" class="attr-grid"></div>
+
+    </div>
+
+
+
+    <div class="panel" style="display:grid; grid-template-columns: repeat(5, 1fr); padding: 15px; text-align:center; background:var(--header-gradient); border:1px solid var(--gold);">
+
+        <div id="calc-le"><b>LEBEN</b><br><span>0</span></div>
+
+        <div id="calc-en"><b>AUSDAUER</b><br><span>0</span></div>
+
+        <div id="calc-rs"><b>RÜSTUNG</b><br><span>0</span></div>
+
+        <div id="calc-gg"><b>GEIST</b><br><span>0</span></div>
+
+        <div id="calc-tc"><b>TREFFER%</b><br><span>0</span></div>
+
+    </div>
+
+
+
+    <div class="panel">
+
+      <div class="panel-header">Inventar & Handel</div>
+
+      <div class="inventar-grid" id="inv-grid"></div>
+
+    </div>
+
+
+
+    <div class="footer-bar" style="padding:15px; display:flex; justify-content:space-between; background: rgba(0,0,0,0.8);">
+
+      <div style="font-size: 14px; color:var(--gold-bright);">Währung: <span id="currency-display" style="color:var(--gold);">0 G 0 S 0 K</span></div>
+
+      <div style="font-size: 14px; color:var(--gold-bright);">SP: <span id="sp-display" style="color:var(--gold);">5000</span></div>
+
+      <button class="btn-main btn-next" id="btn-dayend">Tag beenden</button>
+
+    </div>
+
+  </div>
+
 </div>
 
-<!-- SPEZIALFÄHIGKEIT -->
-<div id="special-modal" class="modal-backdrop">
-  <div class="modal">
-    <h3>Spezialfähigkeit</h3>
-    <div id="special-content"></div>
-    <div class="row" style="text-align:right;">
-      <button class="btn" onclick="closeSpecialModal()">Schließen</button>
-    </div>
-  </div>
-</div>
 
-<!-- DANKES-MODAL / TAG BEENDEN -->
-<div id="thanks-modal" class="modal-backdrop">
-  <div class="modal">
-    <h3>Tag beendet</h3>
-    <div id="thanks-text"></div>
-    <div class="row" style="text-align:right;">
-      <button class="btn primary" onclick="closeThanks()">Weiter</button>
-    </div>
-  </div>
-</div>
 
-<!-- REPARATUR POPUP (Rüstungspuffer/Zone) -->
-<div id="popup-armor-repair" class="modal-backdrop hidden">
-  <div class="modal">
-    <h3>Rüstungsreparatur</h3>
-    <div id="popup-armor-text"></div>
-    <div class="row">
-      <button id="btn-repair-gold" class="btn">Mit Gold reparieren</button>
-      <button id="btn-repair-sp" class="btn">Mit SP reparieren</button>
-    </div>
-    <div class="row" style="text-align:right;">
-      <button id="btn-repair-cancel" class="btn">Abbrechen</button>
-    </div>
-  </div>
-</div>
+<script>
 
-<!-- INVENTAR-VERKAUF POPUP -->
-<div id="sell-popup" class="modal-backdrop hidden">
-  <div class="modal">
-    <h3>Item-Aktion</h3>
-    <div class="row">
-      <button class="btn" onclick="openSellValuePopup()">Verkaufen</button>
-      <button class="btn" onclick="discardItem()">Wegwerfen</button>
-    </div>
-    <div class="row" style="text-align:right;">
-      <button class="btn" onclick="closeSellPopup()">Schließen</button>
-    </div>
-  </div>
-</div>
+const attributes = ["Mut", "Intelligenz", "Fingerfertigkeit", "Gewandtheit", "Körperkraft", "Körperbewusstsein", "Konstitution", "Charisma", "Sozialstatus", "Geistiger Zustand", "Intuition", "Angriff", "Verteidigung", "Abwehrschlag", "Fernkampf", "Trefferchance", "Technik"];
 
-<div id="sell-value-popup" class="modal-backdrop hidden">
-  <div class="modal">
-    <h3>Verkaufspreis</h3>
-    <div class="row small-label">Gold:</div>
-    <input type="number" id="sell-gold" value="0" min="0">
-    <div class="row small-label">Silber:</div>
-    <input type="number" id="sell-silver" value="0" min="0">
-    <div class="row small-label">Kupfer:</div>
-    <input type="number" id="sell-copper" value="0" min="0">
-    <div class="row" style="text-align:right;">
-      <button class="btn" onclick="closeSellValuePopup()">Abbrechen</button>
-      <button class="btn primary" onclick="confirmSell()">Verkaufen</button>
-    </div>
-  </div>
-</div>
+const attrShort = ["MU", "IN", "FF", "GE", "KK", "KB", "KO", "CH", "SS", "GZ", "IT", "AN", "VE", "AS", "FK", "TC", "TE"];
 
-<!-- PROBEN-POPUP -->
-<div id="probe-popup" class="modal-backdrop hidden">
-  <div class="modal">
-    <h3>Probe</h3>
-    <div class="row small-label">
-      Ergebnis:
-    </div>
-    <div id="probe-result"></div>
-    <div class="row">
-      <button class="btn" onclick="performAttributeProbe('IN')">IN-Probe</button>
-      <button class="btn" onclick="performAttributeProbe('GE')">GE-Probe</button>
-      <button class="btn" onclick="performCombinedProbe('KK','GE')">KK+GE</button>
-    </div>
-    <div class="row" style="text-align:right;">
-      <button class="btn" onclick="closeProbePopup()">Schließen</button>
-    </div>
-  </div>
-</div>
 
-<!-- GELD-HISTORIE -->
-<div id="money-history" class="modal-backdrop hidden">
-  <div class="modal">
-    <h3>Geld-Historie</h3>
-    <div id="money-history-list"></div>
-    <div class="row" style="text-align:right;">
-      <button class="btn" onclick="closeMoneyHistory()">Schließen</button>
-    </div>
-  </div>
-</div>
 
-<!-- GEGNER-LEVEL AUSWAHL -->
-<div id="enemy-level-popup" class="modal-backdrop hidden">
-  <div class="modal">
-    <h3>Gegner-Level wählen</h3>
-    <div class="row">
-      <button class="btn" onclick="chooseEnemyLevel(1)">1</button>
-      <button class="btn" onclick="chooseEnemyLevel(3)">3</button>
-      <button class="btn" onclick="chooseEnemyLevel(5)">5</button>
-    </div>
-    <div class="row" style="text-align:right;">
-      <button class="btn" onclick="closeEnemyLevelMenu()">Abbrechen</button>
-    </div>
-  </div>
-</div>
+const originData = {
 
-<!-- GEGNER-TYP AUSWAHL -->
-<div id="enemy-type-popup" class="modal-backdrop hidden">
-  <div class="modal">
-    <h3>Gegner-Typ wählen</h3>
-    <div class="row">
-      <button class="btn" onclick="chooseEnemyType('humanoid')">Humanoid</button>
-      <button class="btn" onclick="chooseEnemyType('beast')">Tier</button>
-      <button class="btn" onclick="chooseEnemyType('undead')">Untot</button>
-      <button class="btn" onclick="chooseEnemyType('demon')">Dämon</button>
-    </div>
-    <div class="row" style="text-align:right;">
-      <button class="btn" onclick="closeEnemyTypeMenu()">Abbrechen</button>
-    </div>
-  </div>
-</div>
+    "Mensch": { subs: ["Mittelländer", "Tulamiden", "Thorwaler"], profs: ["Ritter", "Dieb", "Händler", "Feuermagier", "Druide"] },
 
-<!-- REISE-POPUPS -->
-<div id="travel-popup" class="modal-backdrop hidden">
-  <div class="modal">
-    <h3>Reiseziel wählen</h3>
-    <div id="travel-zone-list"></div>
-    <div class="row" style="text-align:right;">
-      <button class="btn" onclick="closeTravelMenu()">Schließen</button>
-    </div>
-  </div>
-</div>
+    "Elf": { subs: ["Hochelf", "Waldelf", "Dunkelelf"], profs: ["Wildnisläufer", "Necromant", "Druide", "Sänger"] },
 
-<div id="travel-confirm-popup" class="modal-backdrop hidden" data-zone-id="">
-  <div class="modal">
-    <h3>Reise bestätigen</h3>
-    <div class="row">
-      Ziel: <span id="travel-confirm-name"></span>
-    </div>
-    <div class="row small-label">
-      Dauer: <span id="travel-confirm-time"></span> | Gefahr: <span id="travel-confirm-danger"></span>
-    </div>
-    <div class="row" id="travel-confirm-desc"></div>
-    <div class="row" style="text-align:right;">
-      <button class="btn" onclick="closeZoneConfirm()">Abbrechen</button>
-      <button class="btn primary" onclick="confirmTravel()">Reisen</button>
-    </div>
-  </div>
-</div>
+    "Zwerg": { subs: ["Ambosszwerg", "Erzzwerg"], profs: ["Waffenschmied", "Bergmann"] },
 
-<div id="zone-probe-popup" class="modal-backdrop hidden">
-  <div class="modal">
-    <h3>Zonenprobe</h3>
-    <div id="zone-probe-desc"></div>
-    <div class="row small-label">
-      Attribut: <span id="zone-probe-attr"></span> – Schwierigkeit: <span id="zone-probe-diff"></span>
-    </div>
-    <div class="row">
-      <button class="btn" onclick="performZoneEventProbe()">Probe ablegen</button>
-    </div>
-    <div class="row" style="text-align:right;">
-      <button class="btn" onclick="closeZoneProbePopup()">Schließen</button>
-    </div>
-  </
+    "Ork": { subs: ["Schwarzpelz", "Zholochai"], profs: ["Krieger", "Schamane"] }
+
+};
+
+
+
+const idFields = [
+
+    {id:"age",l:"Alter"},{id:"size",l:"Größe"},{id:"weight",l:"Gewicht"},{id:"eyes",l:"Augen"},
+
+    {id:"hair",l:"Haare"},{id:"skin",l:"Haut/Fell"},{id:"hand",l:"Hand"},{id:"voice",l:"Stimme"},
+
+    {id:"clothes",l:"Kleidung"},{id:"spec",l:"Besonderes"},{id:"origin",l:"Heimat"},{id:"scent",l:"Geruch"}
+
+];
+
+
+
+const advPool = ["Wachsam", "Wetterfest", "Tierfreund", "Gutes Gehör", "Sprachtalent", "Richtungssinn", "Eisernes Gedächtnis", "Zäher Hund", "Glückspilz", "Scharfe Sicht", "Balance-Gefühl", "Hohe Schmerzgrenze", "Giftresistenz", "Eiserner Wille", "Diplomat", "Handwerksgeschick", "Orientierung", "Tarnung", "Lügendetektor", "Guter Tänzer", "Adeliges Blut", "Amphibisch", "Astrale Regeneration", "Beidhändigkeit", "Brunnen der Kraft", "Dunkelsicht", "Eisresistenz", "Empathie", "Entfernungssinn", "Fährtensinn", "Feenfreund", "Flink", "Gefahreninstinkt", "Geisteskraft", "Hitzeresistenz", "Immunität gegen Gift", "Innere Uhr", "Intuitive Führung", "Kälteresistenz", "Kampfreflexe", "Magiegespür", "Meisterdieb", "Pflanzenflüsterer", "Prophetische Träume", "Schnelle Heilung", "Schlangenmensch", "Tiersprache", "Unauffällig", "Waffenmeister", "Zwergennase"];
+
+
+
+const disPool = ["Farbenblind", "Tiefschläfer", "Platzangst", "Aberglaube", "Wasserscheu", "Höhenangst", "Goldgier", "Tollpatsch", "Nachtblind", "Kurzsichtig", "Schwerhörig", "Lahmheit", "Einäugig", "Alpträume", "Pechvogel", "Jähzorn", "Neugierig", "Verschwendungssüchtig", "Feigheit", "Arroganz", "Blutrausch", "Einbildung", "Eitelkeit", "Geiz", "Hässlichkeit", "Hitzeempfindlichkeit", "Kälteempfindlichkeit", "Krankheitsanfällig", "Lichtempfindlich", "Meeresangst", "Messie", "Misstrauen", "Nahrungsrestriktion", "Pechmagnet", "Platzangst", "Raumangst", "Schlaflosigkeit", "Schulden", "Sensibler Magen", "Spinnenangst", "Spielsucht", "Sprachfehler", "Streitsucht", "Totenangst", "Unbeholfenheit", "Vergesslichkeit", "Verpflichtungen", "Vorurteile", "Wutanfälle", "Zittrige Hände"];
+
+
+
+let char = {
+
+    name: "", titel: "", attrs: {}, pool: 0, used: 0,
+
+    race: "", sub: "", prof: "", special: "",
+
+    identity: {}, adv: [], dis: [],
+
+    sp: 5000, day: 1, gold: 0, silber: 0, kupfer: 0,
+
+    skills: { base: {}, race: {}, prof: {} },
+
+    dailyPoints: 0, dayEnded: false
+
+};
+
+
+
+function init() {
+
+    const grid1 = document.getElementById('attr-grid-s1');
+
+    attributes.forEach(a => {
+
+        char.attrs[a] = 0;
+
+        grid1.innerHTML += `
+
+            <div class="attr-row" id="row-${a}">
+
+                <span style="font-size:12px;">${a}</span>
+
+                <button class="btn-step" onclick="modAttr('${a}',-1)">▼</button>
+
+                <div class="val-box" id="v-${a}">0</div>
+
+                <button class="btn-step btn-plus" id="plus-${a}" onclick="modAttr('${a}',1)">▲</button>
+
+            </div>`;
+
+    });
+
+
+
+    const rList = document.getElementById('race-list');
+
+    Object.keys(originData).forEach(r => rList.innerHTML += `<div class="check-item" onclick="selectRace('${r}')">${r}</div>`);
+
+
+
+    const idGrid = document.getElementById('id-grid-s2');
+
+    idFields.forEach(f => idGrid.innerHTML += `<div><span style="color:var(--muted)">${f.l}</span><input type="text" oninput="char.identity['${f.id}']=this.value"></div>`);
+
+
+
+    renderTraits();
+
+    initInventar();
+
+    updateUI();
+
+}
+
+
+
+function modAttr(a, v) {
+
+    if (v > 0 && (char.pool - char.used <= 0 || char.attrs[a] >= 10)) return;
+
+    if (v < 0 && char.attrs[a] <= 0) return;
+
+    char.attrs[a] += v; char.used += v;
+
+    updateUI();
+
+}
+
+
+
+function selectRace(r) {
+
+    char.race = r;
+
+    const sList = document.getElementById('sub-list'); sList.innerHTML = "<h4>Untergruppen</h4>";
+
+    originData[r].subs.forEach(s => sList.innerHTML += `<div class="check-item" onclick="selectSub('${s}')">${s}</div>`);
+
+    updateUI();
+
+}
+
+
+
+function selectSub(s) {
+
+    char.sub = s;
+
+    const pList = document.getElementById('prof-list'); pList.innerHTML = "<h4>Professionen</h4>";
+
+    originData[char.race].profs.forEach(p => pList.innerHTML += `<div class="check-item" onclick="selectProf('${p}')">${p}</div>`);
+
+    updateUI();
+
+}
+
+
+
+function selectProf(p) {
+
+    char.prof = p;
+
+    char.special = ["Göttlicher Funke", "Schattenlauf", "Manaschild", "Eisenzorn"][Math.floor(Math.random()*4)];
+
+    updateUI();
+
+}
+
+
+
+function updateUI() {
+
+    document.getElementById('p-left').textContent = char.pool - char.used;
+
+    document.getElementById('s-race').textContent = char.race || "-";
+
+    document.getElementById('s-sub').textContent = char.sub || "-";
+
+    document.getElementById('s-prof').textContent = char.prof || "-";
+
+    document.getElementById('s-spec').textContent = char.special || "-";
+
+    
+
+    attributes.forEach(a => {
+
+        const val = char.attrs[a];
+
+        document.getElementById(`v-${a}`).textContent = val;
+
+        const btn = document.getElementById(`plus-${a}`);
+
+        btn.style.opacity = (char.pool - char.used <= 0 || val >= 10) ? "0.2" : "1";
+
+    });
+
+    drawRadar("radarCanvas");
+
+}
+
+
+
+function drawRadar(id) {
+
+    const canvas = document.getElementById(id), ctx = canvas.getContext("2d"), cx = 110, cy = 110, r = 70;
+
+    ctx.clearRect(0,0,220,220);
+
+    const step = (Math.PI*2)/attributes.length;
+
+    ctx.strokeStyle = "rgba(212,175,55,0.2)";
+
+    attributes.forEach((a, i) => {
+
+        const angle = step*i - Math.PI/2;
+
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(angle)*r, cy+Math.sin(angle)*r); ctx.stroke();
+
+        ctx.fillStyle = "var(--gold)"; ctx.font = "8px serif";
+
+        ctx.fillText(attrShort[i], cx+Math.cos(angle)*(r+12)-5, cy+Math.sin(angle)*(r+12)
